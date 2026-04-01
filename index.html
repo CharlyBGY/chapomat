@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Chapeau de Matignon</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --gold-dark: #8a6a20;
+    --ink: #1a1208;
+    --parchment: #f5ead0;
+    --parchment-dark: #e8d4a0;
+    --red: #8b1a1a;
+    --blue: #1a3a6b;
+    --green: #1a5c2a;
+    --purple: #4a1a6b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: #0d0a05;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(90,60,10,0.3) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(60,20,80,0.2) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'EB Garamond', serif;
+    overflow-x: hidden;
+  }
+
+  /* Stars */
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .star {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--d) ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.1; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.5); }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    width: 100%;
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+
+  /* Header */
+  .header-ornament {
+    color: var(--gold);
+    font-size: 1.2rem;
+    letter-spacing: 8px;
+    margin-bottom: 0.5rem;
+    opacity: 0.7;
+  }
+
+  h1 {
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--gold-light);
+    font-size: clamp(1.6rem, 4vw, 2.8rem);
+    line-height: 1.2;
+    text-shadow: 0 0 40px rgba(201,168,76,0.5), 0 2px 4px rgba(0,0,0,0.8);
+    margin-bottom: 0.3rem;
+  }
+
+  .subtitle {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    font-size: 0.85rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 2rem;
+  }
+
+  /* Hat */
+  .hat-wrapper {
+    position: relative;
+    display: inline-block;
+    margin: 1.5rem auto 2rem;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+  .hat-wrapper:hover { transform: scale(1.05) rotate(-2deg); }
+
+  .hat-svg {
+    width: 120px;
+    filter: drop-shadow(0 0 20px rgba(201,168,76,0.4));
+    transition: filter 0.3s;
+  }
+  .hat-wrapper:hover .hat-svg {
+    filter: drop-shadow(0 0 35px rgba(201,168,76,0.8));
+    animation: hat-wobble 0.5s ease-in-out;
+  }
+
+  @keyframes hat-wobble {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+  }
+
+  /* Card */
+  .card {
+    background: linear-gradient(135deg, rgba(245,234,208,0.06) 0%, rgba(201,168,76,0.04) 100%);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 4px;
+    padding: 2rem;
+    position: relative;
+    box-shadow: 0 0 60px rgba(0,0,0,0.5), inset 0 0 30px rgba(201,168,76,0.03);
+  }
+
+  .card::before, .card::after {
+    content: '✦';
+    position: absolute;
+    color: var(--gold);
+    font-size: 1.2rem;
+    opacity: 0.5;
+  }
+  .card::before { top: 12px; left: 16px; }
+  .card::after { bottom: 12px; right: 16px; }
+
+  /* Intro text */
+  .intro {
+    color: var(--parchment);
+    font-size: 1.05rem;
+    font-style: italic;
+    line-height: 1.7;
+    margin-bottom: 1.8rem;
+    opacity: 0.85;
+  }
+
+  /* Form */
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  input[type="date"] {
+    width: 100%;
+    max-width: 280px;
+    padding: 0.8rem 1.2rem;
+    background: rgba(245,234,208,0.07);
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 2px;
+    color: var(--parchment);
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  input[type="date"]:focus {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.1);
+    box-shadow: 0 0 20px rgba(201,168,76,0.2);
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7) sepia(1) saturate(3) hue-rotate(5deg);
+    cursor: pointer;
+  }
+
+  /* Button */
+  .btn {
+    margin-top: 0.5rem;
+    padding: 0.9rem 2.5rem;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s;
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.4s;
+  }
+  .btn:hover {
+    box-shadow: 0 0 25px rgba(201,168,76,0.3);
+    color: white;
+  }
+  .btn:hover::before { transform: translateX(100%); }
+
+  /* Result */
+  .result {
+    display: none;
+    margin-top: 2rem;
+    animation: reveal 0.8s ease-out forwards;
+  }
+
+  @keyframes reveal {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .result-house {
+    border-radius: 3px;
+    padding: 1.8rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-house::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.07;
+    background: repeating-linear-gradient(
+      45deg,
+      currentColor,
+      currentColor 1px,
+      transparent 1px,
+      transparent 10px
+    );
+  }
+
+  .result-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 0.3rem;
+  }
+
+  .result-pm {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+    line-height: 1.2;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    margin-bottom: 0.2rem;
+  }
+
+  .result-dates {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    opacity: 0.7;
+    margin-bottom: 1rem;
+  }
+
+  .result-quote {
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.65;
+    opacity: 0.88;
+    max-width: 450px;
+    margin: 0 auto 0.8rem;
+  }
+
+  .result-party {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 0.3rem 1rem;
+    border: 1px solid currentColor;
+    border-radius: 20px;
+    opacity: 0.65;
+  }
+
+  .magic-sparks {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .spark {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    animation: sparkfly 0.8s ease-out forwards;
+  }
+  @keyframes sparkfly {
+    0% { transform: translate(0,0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    opacity: 0.3;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gold);
+  }
+  .divider span { color: var(--gold); font-size: 0.8rem; }
+
+  .again-btn {
+    margin-top: 1rem;
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+  .again-btn:hover { opacity: 1; }
+
+  .footnote {
+    margin-top: 2rem;
+    color: rgba(245,234,208,0.35);
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <div class="header-ornament">✦ ✦ ✦</div>
+  <h1>Le Chapeau<br>de Matignon</h1>
+  <p class="subtitle">Révélation républicaine</p>
+
+  <div class="hat-wrapper" onclick="wobbleHat()">
+    <svg class="hat-svg" viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Brim -->
+      <ellipse cx="60" cy="105" rx="55" ry="12" fill="#2a1f0a" stroke="#c9a84c" stroke-width="1.5"/>
+      <!-- Body -->
+      <path d="M20 105 C18 80 15 50 30 20 C40 5 50 2 60 2 C70 2 80 5 90 20 C105 50 102 80 100 105 Z" fill="#1a1208" stroke="#c9a84c" stroke-width="1.5"/>
+      <!-- Wrinkles -->
+      <path d="M35 90 Q45 85 55 88" stroke="#c9a84c" stroke-width="0.6" opacity="0.4" stroke-linecap="round"/>
+      <path d="M80 85 Q70 80 62 83" stroke="#c9a84c" stroke-width="0.6" opacity="0.4" stroke-linecap="round"/>
+      <path d="M32 70 Q42 65 52 68" stroke="#c9a84c" stroke-width="0.5" opacity="0.3" stroke-linecap="round"/>
+      <!-- Band -->
+      <path d="M20 105 C25 95 95 95 100 105" fill="#8a6a20" opacity="0.6"/>
+      <!-- Buckle -->
+      <rect x="52" y="96" width="16" height="10" rx="1" fill="#c9a84c" opacity="0.8"/>
+      <rect x="55" y="99" width="10" height="4" rx="0.5" fill="#1a1208"/>
+      <!-- Eyes glow -->
+      <ellipse cx="44" cy="60" rx="5" ry="3" fill="#c9a84c" opacity="0" id="eye-left">
+        <animate attributeName="opacity" values="0;0.8;0" dur="3s" repeatCount="indefinite" begin="1s"/>
+      </ellipse>
+      <ellipse cx="76" cy="60" rx="5" ry="3" fill="#c9a84c" opacity="0" id="eye-right">
+        <animate attributeName="opacity" values="0;0.8;0" dur="3s" repeatCount="indefinite" begin="1s"/>
+      </ellipse>
+      <!-- Mouth curve -->
+      <path d="M48 75 Q60 82 72 75" stroke="#c9a84c" stroke-width="1" fill="none" opacity="0" id="mouth">
+        <animate attributeName="opacity" values="0;0.7;0" dur="3s" repeatCount="indefinite" begin="1.2s"/>
+      </path>
+    </svg>
+  </div>
+
+  <div class="card">
+    <p class="intro">
+      « Posez votre date de naissance sur ma coiffe usée par les mandats,<br>
+      et je révèlerai à quelle maison de la République vous appartenez. »
+    </p>
+
+    <div id="form-section">
+      <div class="form-group">
+        <label>Votre date de naissance</label>
+        <input type="date" id="birthdate" min="1958-01-01" max="2025-12-31">
+      </div>
+      <button class="btn" onclick="reveal()">✦ Révéler ma maison ✦</button>
+    </div>
+
+    <div class="result" id="result">
+      <div class="divider"><span>⚜</span></div>
+      <div class="result-house" id="result-house">
+        <p class="result-label" id="result-label">Votre Premier Ministre</p>
+        <div class="result-pm" id="result-pm"></div>
+        <div class="result-dates" id="result-dates"></div>
+        <p class="result-quote" id="result-quote"></p>
+        <span class="result-party" id="result-party"></span>
+      </div>
+      <button class="again-btn" onclick="reset()">↩ Recommencer l'incantation</button>
+    </div>
+  </div>
+
+  <p class="footnote">* Basé sur la Ve République · Données officielles</p>
+</div>
+
+<div class="magic-sparks" id="sparks"></div>
+
+<script>
+// Prime Ministers data
+const PMs = [
+  {
+    name: "Michel Debré",
+    start: new Date("1959-01-08"),
+    end: new Date("1962-04-14"),
+    party: "Gaullisme",
+    quote: "La France est la lumière du monde — si cette lumière s'éteint, les ténèbres s'installent. Vous portez en vous l'ambition d'une République neuve.",
+    color: "#1a3a6b",
+    accent: "#5a8fd0"
+  },
+  {
+    name: "Georges Pompidou",
+    start: new Date("1962-04-14"),
+    end: new Date("1968-07-10"),
+    party: "Gaullisme · UDR",
+    quote: "Né sous Pompidou, vous êtes fait d'élégance discrète et de pragmatisme tenace. L'art de gouverner sans le montrer coulait déjà dans l'air de votre naissance.",
+    color: "#3d2b6b",
+    accent: "#a080d0"
+  },
+  {
+    name: "Maurice Couve de Murville",
+    start: new Date("1968-07-10"),
+    end: new Date("1969-06-20"),
+    party: "UDR",
+    quote: "Une maison rare comme un été de mai : froide en apparence, rigoureuse au fond. Vous avez l'âme du technicien qui fait l'Histoire en silence.",
+    color: "#1a3a1a",
+    accent: "#60a060"
+  },
+  {
+    name: "Jacques Chaban-Delmas",
+    start: new Date("1969-06-20"),
+    end: new Date("1972-07-05"),
+    party: "UDR",
+    quote: "Votre maison est celle de la Nouvelle Société — réformatrice, sportive, lumineuse. Vous avancez vite et n'attendez pas la permission.",
+    color: "#6b3a1a",
+    accent: "#d0905a"
+  },
+  {
+    name: "Pierre Messmer",
+    start: new Date("1972-07-05"),
+    end: new Date("1974-05-27"),
+    party: "UDR",
+    quote: "Loyal et discret, né sous le signe du service de l'État. Votre maison ne cherche pas les projecteurs — elle les mérite sans les réclamer.",
+    color: "#2a1a1a",
+    accent: "#a04040"
+  },
+  {
+    name: "Jacques Chirac",
+    start: new Date("1974-05-27"),
+    end: new Date("1976-08-25"),
+    party: "RPR",
+    quote: "Premier passage du Corrézien à Matignon. Votre maison est celle de l'énergie brute, de l'ambition assumée — et d'un sens paysan de la durée.",
+    color: "#1a2a4a",
+    accent: "#4a7ab0"
+  },
+  {
+    name: "Raymond Barre",
+    start: new Date("1976-08-25"),
+    end: new Date("1981-05-13"),
+    party: "UDF",
+    quote: "Né sous l'économiste, vous avez la rigueur dans les gènes et le bon sens comme boussole. On dit que vous êtes le meilleur d'entre eux — vous le savez.",
+    color: "#1a3a2a",
+    accent: "#50a070"
+  },
+  {
+    name: "Pierre Mauroy",
+    start: new Date("1981-05-13"),
+    end: new Date("1984-07-17"),
+    party: "Parti Socialiste",
+    quote: "L'aurore rose de 1981 a baigné votre berceau. Votre maison est celle du grand souffle collectif, des 39 heures et de la retraite à 60 ans. Le peuple en vous.",
+    color: "#6b1a2a",
+    accent: "#d04060"
+  },
+  {
+    name: "Laurent Fabius",
+    start: new Date("1984-07-17"),
+    end: new Date("1986-03-20"),
+    party: "Parti Socialiste",
+    quote: "Plus jeune Premier Ministre de la Ve République — votre maison est celle de la précocité brillante. Vous n'avez pas attendu d'être prêt. Vous étiez déjà là.",
+    color: "#1a1a6b",
+    accent: "#5050d0"
+  },
+  {
+    name: "Jacques Chirac",
+    start: new Date("1986-03-20"),
+    end: new Date("1988-05-10"),
+    party: "RPR",
+    quote: "La cohabitation comme terrain de jeu. Né dans cette maison, vous avez appris que le pouvoir se partage parfois — mais jamais pour longtemps.",
+    color: "#3a1a1a",
+    accent: "#b05050"
+  },
+  {
+    name: "Michel Rocard",
+    start: new Date("1988-05-10"),
+    end: new Date("1991-05-15"),
+    party: "Parti Socialiste",
+    quote: "La maison du possible, de la deuxième gauche et des consensus introuvables. Vous cherchez le compromis non par faiblesse, mais par intelligence.",
+    color: "#1a3a50",
+    accent: "#4090c0"
+  },
+  {
+    name: "Édith Cresson",
+    start: new Date("1991-05-15"),
+    end: new Date("1992-04-02"),
+    party: "Parti Socialiste",
+    quote: "Née sous la première — et unique — femme Premier Ministre. Votre maison brise les plafonds. Pionnière par essence, pionnière par choix.",
+    color: "#5a1a4a",
+    accent: "#c060a0"
+  },
+  {
+    name: "Pierre Bérégovoy",
+    start: new Date("1992-04-02"),
+    end: new Date("1993-03-29"),
+    party: "Parti Socialiste",
+    quote: "Né sous l'homme venu du peuple, autodidacte au sommet de l'État. Votre maison est celle de la dignité gagnée à la force du travail et de la conviction.",
+    color: "#1a3a1a",
+    accent: "#508050"
+  },
+  {
+    name: "Édouard Balladur",
+    start: new Date("1993-03-29"),
+    end: new Date("1995-05-17"),
+    party: "RPR",
+    quote: "Né sous les ors de la cohabitation tranquille. Votre maison est celle du flegme et de l'autorité naturelle — gouverner avec l'air de ne pas gouverner.",
+    color: "#2a2a1a",
+    accent: "#a09040"
+  },
+  {
+    name: "Alain Juppé",
+    start: new Date("1995-05-17"),
+    end: new Date("1997-06-02"),
+    party: "RPR",
+    quote: "Votre maison est celle de la rigueur incomprise. Né en un temps de réformes difficiles, vous êtes fait pour les décisions que les autres n'osent pas.",
+    color: "#1a1a3a",
+    accent: "#6060c0"
+  },
+  {
+    name: "Lionel Jospin",
+    start: new Date("1997-06-02"),
+    end: new Date("2002-05-06"),
+    party: "Parti Socialiste",
+    quote: "La cohabitation en rose — votre maison est celle des 35 heures, de la parité et du PACS. Né dans un élan de réforme, vous croyez que le progrès est possible.",
+    color: "#4a1a1a",
+    accent: "#c04040"
+  },
+  {
+    name: "Jean-Pierre Raffarin",
+    start: new Date("2002-05-06"),
+    end: new Date("2004-03-30"),
+    party: "UMP",
+    quote: "La France d'en bas vous a vu naître. Votre maison est celle du bon sens provincial, du parler vrai et de la proximité que Paris oublie toujours.",
+    color: "#2a1a0a",
+    accent: "#a07050"
+  },
+  {
+    name: "Dominique de Villepin",
+    start: new Date("2004-03-30"),
+    end: new Date("2005-05-31"),
+    party: "UMP",
+    quote: "Né sous le poète des grandes heures, votre maison est celle de l'éloquence souveraine et du geste historique. Vous êtes fait pour les tribunes.",
+    color: "#1a2a1a",
+    accent: "#608060"
+  },
+  {
+    name: "Dominique de Villepin",
+    start: new Date("2005-05-31"),
+    end: new Date("2007-05-15"),
+    party: "UMP",
+    quote: "Né sous le poète des grandes heures, votre maison est celle de l'éloquence souveraine et du geste historique. Vous êtes fait pour les tribunes.",
+    color: "#1a2a1a",
+    accent: "#608060"
+  },
+  {
+    name: "François Fillon",
+    start: new Date("2007-05-15"),
+    end: new Date("2012-05-15"),
+    party: "UMP",
+    quote: "Votre maison est celle du loyalisme et de la constance. Cinq ans sous Sarkozy — vous avez appris que l'endurance est la première des vertus politiques.",
+    color: "#1a1a2a",
+    accent: "#5060a0"
+  },
+  {
+    name: "Jean-Marc Ayrault",
+    start: new Date("2012-05-15"),
+    end: new Date("2014-03-31"),
+    party: "Parti Socialiste",
+    quote: "Né sous le germaniste de Nantes, votre maison est celle du dialogue et de la méthode. Vous prenez le temps qu'il faut — même si les autres n'attendent pas.",
+    color: "#3a1a1a",
+    accent: "#c05050"
+  },
+  {
+    name: "Manuel Valls",
+    start: new Date("2014-03-31"),
+    end: new Date("2016-12-06"),
+    party: "Parti Socialiste",
+    quote: "Né sous la poigne catalane, votre maison est celle de l'autorité revendiquée et de la réforme musclée. Vous n'avez pas peur de déplaire — c'est votre force.",
+    color: "#2a1a2a",
+    accent: "#a050a0"
+  },
+  {
+    name: "Bernard Cazeneuve",
+    start: new Date("2016-12-06"),
+    end: new Date("2017-05-15"),
+    party: "Parti Socialiste",
+    quote: "Une maison de transition et de dignité. Né en ces mois discrets, vous portez l'art de tenir les institutions quand elles tremblent.",
+    color: "#1a2a3a",
+    accent: "#4080b0"
+  },
+  {
+    name: "Édouard Philippe",
+    start: new Date("2017-05-15"),
+    end: new Date("2020-07-03"),
+    party: "La République En Marche",
+    quote: "Né sous le Havrais aux convictions propres, votre maison conjugue droiture et adaptabilité. Vous traversez les tempêtes en gilets jaunes sans perdre le cap.",
+    color: "#0a2a2a",
+    accent: "#30a0a0"
+  },
+  {
+    name: "Jean Castex",
+    start: new Date("2020-07-03"),
+    end: new Date("2022-05-16"),
+    party: "La République En Marche",
+    quote: "Né en pleine pandémie mondiale — votre maison est celle de la résilience et de la gestion de crise. Vous portez l'épreuve collective comme un blason.",
+    color: "#1a1a2a",
+    accent: "#5050c0"
+  },
+  {
+    name: "Élisabeth Borne",
+    start: new Date("2022-05-16"),
+    end: new Date("2024-01-08"),
+    party: "Renaissance",
+    quote: "Deuxième femme à Matignon — votre maison est celle de la ténacité silencieuse et du texte 49.3. Vous gouvernez sans majorité et sans excuses.",
+    color: "#3a1a3a",
+    accent: "#c060c0"
+  },
+  {
+    name: "Gabriel Attal",
+    start: new Date("2024-01-08"),
+    end: new Date("2024-09-05"),
+    party: "Renaissance",
+    quote: "Le plus jeune Premier Ministre — votre maison est celle de la nouveauté revendiquée. Né dans ce sillage, vous assumez d'arriver trop tôt.",
+    color: "#0a2a3a",
+    accent: "#30a0d0"
+  },
+  {
+    name: "Michel Barnier",
+    start: new Date("2024-09-05"),
+    end: new Date("2024-12-13"),
+    party: "LR",
+    quote: "Né sous le négociateur du Brexit, votre maison est celle de l'expérience millésimée. Le chapeau reconnaît en vous un esprit qui sait que rien ne dure — sauf ce qu'on bâtit patiemment.",
+    color: "#1a2a1a",
+    accent: "#508050"
+  },
+  {
+    name: "François Bayrou",
+    start: new Date("2024-12-13"),
+    end: new Date("2099-01-01"), // current
+    party: "MoDem",
+    quote: "Né sous le Béarnais, dernier en date à Matignon, votre maison est celle du centre indéfectible. Vous attendez votre heure depuis trente ans — elle est arrivée.",
+    color: "#2a1a0a",
+    accent: "#d08030"
+  }
+];
+
+function findPM(date) {
+  const d = new Date(date);
+  for (let i = PMs.length - 1; i >= 0; i--) {
+    if (d >= PMs[i].start && d < PMs[i].end) {
+      return PMs[i];
+    }
+  }
+  return null;
+}
+
+function reveal() {
+  const input = document.getElementById('birthdate').value;
+  if (!input) {
+    shakeInput();
+    return;
+  }
+
+  const pm = findPM(input);
+  if (!pm) {
+    document.getElementById('result-pm').textContent = "Hors de la Ve République";
+    document.getElementById('result-quote').textContent = "Le chapeau ne connaît que la Ve République, née en janvier 1959. Votre date sort des limites de sa mémoire.";
+    document.getElementById('result-dates').textContent = "";
+    document.getElementById('result-party').textContent = "Mystère";
+    styleResult("#555", "#aaa");
+    showResult();
+    return;
+  }
+
+  document.getElementById('result-pm').textContent = pm.name;
+  document.getElementById('result-dates').textContent =
+    pm.start.toLocaleDateString('fr-FR', {month:'long', year:'numeric'}) +
+    " — " +
+    (pm.end.getFullYear() > 2025 ? "aujourd'hui" : pm.end.toLocaleDateString('fr-FR', {month:'long', year:'numeric'}));
+  document.getElementById('result-quote').textContent = `« ${pm.quote} »`;
+  document.getElementById('result-party').textContent = pm.party;
+  styleResult(pm.color, pm.accent);
+  showResult();
+  launchSparks(pm.accent);
+}
+
+function styleResult(bg, accent) {
+  const house = document.getElementById('result-house');
+  house.style.background = `linear-gradient(135deg, ${bg}cc 0%, ${bg}88 100%)`;
+  house.style.border = `1px solid ${accent}66`;
+  house.style.color = '#f5ead0';
+  const party = document.getElementById('result-party');
+  party.style.borderColor = accent;
+  party.style.color = accent;
+  const pm = document.getElementById('result-pm');
+  pm.style.color = '#f0d080';
+  pm.style.textShadow = `0 0 30px ${accent}88`;
+}
+
+function showResult() {
+  document.getElementById('form-section').style.display = 'none';
+  const result = document.getElementById('result');
+  result.style.display = 'block';
+  result.style.animation = 'none';
+  requestAnimationFrame(() => {
+    result.style.animation = 'reveal 0.8s ease-out forwards';
+  });
+}
+
+function reset() {
+  document.getElementById('form-section').style.display = 'block';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('birthdate').value = '';
+}
+
+function shakeInput() {
+  const input = document.getElementById('birthdate');
+  input.style.animation = 'none';
+  input.style.borderColor = '#c04040';
+  setTimeout(() => { input.style.borderColor = ''; }, 1500);
+}
+
+function wobbleHat() {
+  launchSparks('#c9a84c');
+}
+
+function launchSparks(color) {
+  const container = document.getElementById('sparks');
+  const hatRect = document.querySelector('.hat-wrapper').getBoundingClientRect();
+  const cx = hatRect.left + hatRect.width / 2;
+  const cy = hatRect.top + hatRect.height / 2;
+
+  for (let i = 0; i < 18; i++) {
+    const spark = document.createElement('div');
+    spark.className = 'spark';
+    const angle = (Math.random() * 360) * Math.PI / 180;
+    const dist = 60 + Math.random() * 80;
+    spark.style.cssText = `
+      left: ${cx}px; top: ${cy}px;
+      background: ${color};
+      --tx: ${Math.cos(angle) * dist}px;
+      --ty: ${Math.sin(angle) * dist}px;
+      animation-delay: ${Math.random() * 0.2}s;
+      animation-duration: ${0.6 + Math.random() * 0.4}s;
+      box-shadow: 0 0 6px ${color};
+    `;
+    container.appendChild(spark);
+    setTimeout(() => spark.remove(), 1200);
+  }
+}
+
+// Generate stars
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 120; i++) {
+  const star = document.createElement('div');
+  star.className = 'star';
+  star.style.cssText = `
+    left: ${Math.random() * 100}%;
+    top: ${Math.random() * 100}%;
+    width: ${Math.random() < 0.8 ? 1 : 2}px;
+    height: ${Math.random() < 0.8 ? 1 : 2}px;
+    --d: ${2 + Math.random() * 4}s;
+    animation-delay: ${Math.random() * 5}s;
+    opacity: ${0.1 + Math.random() * 0.5};
+  `;
+  starsEl.appendChild(star);
+}
+
+// Allow Enter key
+document.getElementById('birthdate').addEventListener('keypress', e => {
+  if (e.key === 'Enter') reveal();
+});
+</script>
+</body>
+</html>
