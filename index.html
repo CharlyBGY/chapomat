@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Le Chapeau de Matignon</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 <style>
   :root {
     --gold: #c9a84c;
@@ -350,6 +351,63 @@
     font-size: 0.8rem;
     font-style: italic;
   }
+
+  /* Music button */
+  .music-btn {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 100;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(13,10,5,0.85);
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  }
+  .music-btn:hover {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(201,168,76,0.3);
+    transform: scale(1.1);
+  }
+  .music-btn.playing {
+    animation: pulse-ring 2s ease-in-out infinite;
+  }
+  @keyframes pulse-ring {
+    0%, 100% { box-shadow: 0 0 15px rgba(201,168,76,0.2); }
+    50% { box-shadow: 0 0 25px rgba(201,168,76,0.5); }
+  }
+  .music-hint {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 4.5rem;
+    z-index: 100;
+    background: rgba(13,10,5,0.9);
+    border: 1px solid rgba(201,168,76,0.25);
+    color: rgba(245,234,208,0.7);
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    padding: 0.4rem 0.8rem;
+    border-radius: 2px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(8px);
+    transition: all 0.4s;
+    white-space: nowrap;
+  }
+  .music-hint.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
 </style>
 </head>
 <body>
@@ -421,6 +479,8 @@
 </div>
 
 <div class="magic-sparks" id="sparks"></div>
+<button class="music-btn" id="music-btn" onclick="toggleMusic()" title="Musique">♪</button>
+<div class="music-hint" id="music-hint">MUSIQUE</div>
 
 <script>
 // Prime Ministers data
@@ -814,6 +874,110 @@ for (let i = 0; i < 120; i++) {
 document.getElementById('birthdate').addEventListener('keypress', e => {
   if (e.key === 'Enter') reveal();
 });
+
+// ── Music Engine ──────────────────────────────────────────────
+let musicStarted = false;
+let isPlaying = false;
+let musicLoop = null;
+let synth = null;
+
+// Hedwig's Theme — notes encoded as [note, duration, delayFromPrev]
+// duration & delay in seconds (tempo ~76 bpm, quarter = 0.79s)
+const Q = 0.79;   // quarter note
+const E = Q/2;    // eighth
+const H = Q*2;    // half
+const DQ = Q*1.5; // dotted quarter
+
+const melody = [
+  // Bar 1
+  ["B4", E, 0], ["E5", DQ, E], ["G5", E, DQ], ["F#5", Q, E],
+  // Bar 2
+  ["E5", H, Q], ["B5", Q, H], ["A5", DQ+Q, Q],
+  // Bar 3
+  ["F#5", DQ+Q, DQ+Q], ["E5", DQ, DQ+Q], ["G5", E, DQ], ["F#5", Q, E],
+  // Bar 4
+  ["D5", H, Q], ["F5", Q, H], ["B4", DQ+Q+H, Q],
+  // Bar 5 (repeat-ish)
+  ["E5", DQ, DQ+Q+H], ["G5", E, DQ], ["F#5", Q, E],
+  ["E5", H, Q], ["B5", Q, H],
+  ["A5", Q, Q], ["F5", E, Q], ["F5", E, E],
+  ["A5", DQ, E], ["Ab5", E, DQ], ["G5", E, E],
+  ["F#5", E, E], ["E5", Q, E],
+  ["B5", E, Q], ["E6", DQ, E], ["D6", E, DQ],
+  ["C6", Q, E], ["B5", H, Q],
+  ["G5", Q, H], ["F#5", E, Q], ["F#5", E, E],
+  ["F#5", Q, E], ["E5", H, Q], ["E5", E, H],
+];
+
+async function initMusic() {
+  if (musicStarted) return;
+  musicStarted = true;
+  await Tone.start();
+
+  // Music box / celesta timbre
+  synth = new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: "triangle" },
+    envelope: { attack: 0.005, decay: 0.6, sustain: 0.05, release: 1.2 },
+    volume: -10
+  }).toDestination();
+
+  // Add a touch of reverb for magic
+  const reverb = new Tone.Reverb({ decay: 3.5, wet: 0.45 }).toDestination();
+  synth.connect(reverb);
+
+  // Also add a subtle high-pass to keep it ethereal
+  const filter = new Tone.Filter(300, "highpass").connect(reverb);
+  synth.connect(filter);
+}
+
+function playMelody() {
+  let time = Tone.now() + 0.1;
+  melody.forEach(([note, dur, delay]) => {
+    time += delay;
+    synth.triggerAttackRelease(note, dur * 0.85, time);
+  });
+  // Total duration of melody in seconds
+  const totalDuration = melody.reduce((acc, [,dur, delay]) => acc + delay + dur, 0);
+  return totalDuration + 1.5; // add tail time
+}
+
+async function toggleMusic() {
+  const btn = document.getElementById('music-btn');
+  const hint = document.getElementById('music-hint');
+
+  if (!musicStarted) {
+    await initMusic();
+    // Show hint briefly
+    hint.classList.add('visible');
+    setTimeout(() => hint.classList.remove('visible'), 2000);
+  }
+
+  if (!isPlaying) {
+    isPlaying = true;
+    btn.textContent = '♬';
+    btn.classList.add('playing');
+
+    const loop = async () => {
+      if (!isPlaying) return;
+      const duration = playMelody();
+      musicLoop = setTimeout(loop, duration * 1000);
+    };
+    loop();
+  } else {
+    isPlaying = false;
+    btn.textContent = '♪';
+    btn.classList.remove('playing');
+    if (musicLoop) clearTimeout(musicLoop);
+    synth.releaseAll();
+  }
+}
+
+// Show hint on first load after 2 sec
+setTimeout(() => {
+  const hint = document.getElementById('music-hint');
+  hint.classList.add('visible');
+  setTimeout(() => hint.classList.remove('visible'), 3000);
+}, 2000);
 </script>
 </body>
 </html>
